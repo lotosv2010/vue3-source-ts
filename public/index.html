@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="../dist/vue.js"></script>
+</head>
+<body>
+  <div id="app">app</div>
+  <script>
+    const { reactive, effect, createApp, h } = Vue
+    // 1.reactivity
+    /*
+    // 对象
+    const state = reactive({ name: 'robin', 'age': 18, address: 'sh' })
+    setTimeout(() =>{
+      // 测试修改属性
+      state.age = 20
+    }, 1000)
+    setTimeout(() => {
+      // 测试新增属性
+      state.sex = 'man'
+    }, 1000)
+    setTimeout(() => {
+      // 没有依赖不会更新视图
+      state.address = 'bj'
+    },1000)
+    console.log(state)
+
+    const app = document.querySelector('#app')
+    effect(() => {
+      app.innerHTML = `${state.name} ${state.age} 岁了`
+    })
+
+    // 数组
+    const state = reactive([1, 2, 3])
+    const app = document.querySelector('#app')
+    effect(() => {
+      // effect 中使用了length 改 length是可以触发更新的
+      // 但是没用length，就不会触发更新
+      app.innerHTML = state[2]
+    })
+    setTimeout(() => {
+      state.length = 1
+    }, 1000)
+    */
+
+    // 2.runtime-dom
+    /*
+    let App = {
+      setup() {
+        let state = reactive({
+          name: 'robin',
+          age: 18,
+          flag: true
+        })
+
+        setTimeout(() => {
+          state.flag = !state.flag
+        }, 1000)
+
+        return () => { // render
+          return state.flag ? h('div',{
+            style: {
+              color: 'red'
+            }
+          }, `${state.name} ${state.age} 岁了`):
+          h('div',{
+            style: {
+              color: 'blue'
+            }
+          }, [h('p', {}, `hello,`), h('span', {}, `${state.name} ${state.age} 岁了`)])
+        }
+      }
+    }
+    // runtime-dom 针对浏览器平台
+    // runtime-core 核心
+    // console.log(Vue)
+    createApp(App).mount('#app')
+    */
+
+    // 3.diff
+    let App = {
+      setup() {
+        let state = reactive({
+          flag: true
+        })
+
+        setTimeout(() => {
+          state.flag = !state.flag
+        }, 3000)
+
+        return () => { // render
+          return state.flag ? h('ul',{
+            style: {
+              color: 'white'
+            }
+          }, [
+            h('li', { key: 'A', style: { background: 'red' }}, 'A'),
+            h('li', { key: 'B', style: { background: 'yellow' }}, 'B'),
+
+            h('li', { key: 'C', style: { background: 'blue' }}, 'C'),
+            h('li', { key: 'D', style: { background: 'red' }}, 'D'),
+            h('li', { key: 'E', style: { background: 'red' }}, 'E'),
+
+            h('li', { key: 'F', style: { background: 'red' }}, 'F'),
+            h('li', { key: 'G', style: { background: 'red' }}, 'G')
+          ]):
+          h('ul',{
+            style: {
+              color: 'blue'
+            }
+          }, [
+            // h('li', { key: 'E', style: { background: 'red' }}, 'E'),
+            h('li', { key: 'A', style: { background: 'red' }}, 'A'),
+            h('li', { key: 'B', style: { background: 'yellow' }}, 'B'),
+
+            h('li', { key: 'D', style: { background: 'red' }}, 'D'),
+            h('li', { key: 'E', style: { background: 'red' }}, 'E'),
+            h('li', { key: 'C', style: { background: 'green' }}, 'C'),
+            h('li', { key: 'H', style: { background: 'purple' }}, 'H'),
+
+            h('li', { key: 'F', style: { background: 'red' }}, 'F'),
+            h('li', { key: 'G', style: { background: 'purple' }}, 'G')
+          ])
+        }
+      }
+    }
+    createApp(App).mount('#app')
+  </script>
+</body>
+</html>
